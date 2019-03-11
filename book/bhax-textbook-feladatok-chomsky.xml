@@ -19,6 +19,31 @@
         <para>
             Tanulságok, tapasztalatok, magyarázat...
         </para>
+	<para>
+	 <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/unvalami.png" scale="50" />
+                </imageobject>
+	</mediaobject>
+	</para>
+	<para>
+	Az unáris számrendszer, azaz egyes számrendszer, lényege, hogy a számot egységekkel jelezzül, pl a 2-őt két db vonallal, és igy tovább. Az alábbi program bekér egy számot, majd a 'for' ciklussal annyiszor írjuk ki az egységet (jelen esetben 'I').
+	<programlisting><![CDATA[
+	int main ()
+	{
+	  int x;
+	  printf ("Adjon meg egy szamot:");
+	  scanf ("%d", &x);
+	  for (int i = 0; i < x; i++)
+	    {
+	      printf ("I");
+	    }
+	  return 0;
+	}
+
+	]]></programlisting> 
+	
+	</para>
     </section>        
         
     <section>
@@ -51,7 +76,33 @@
             Megoldás forrása:  
         </para>
         <para>
-            Tanulságok, tapasztalatok, magyarázat...
+	<programlisting><![CDATA[
+            #include <stdio.h>
+	    int main ()
+	    {
+	      // Printing to screen.
+	      printf ("Hello World\n");
+	    }
+	]]></programlisting>
+	</para>
+	<para>
+	C99-et használva lefordul. :)
+	<screen>
+	batf41@batf41-VirtualBox:~/Asztal$ gcc -o c89 -std=c99 c89.c
+	batf41@batf41-VirtualBox:~/Asztal$ 
+	</screen>
+	</para>
+	<para>
+	C89-el már nem. :(
+	<screen>
+	batf41@batf41-VirtualBox:~/Asztal$ gcc -o c89 -std=c89 c89.c
+	c89.c: In function ‘main’:
+	c89.c:4:7: error: C++ style comments are not allowed in ISO C90
+       	// Printing to screen.
+      	 ^
+	c89.c:4:7: error: (this will be reported only once per input file)
+	batf41@batf41-VirtualBox:~/Asztal$ 
+	</screen>
         </para>
     </section>                     
 
@@ -71,6 +122,84 @@
         <para>
             Tanulságok, tapasztalatok, magyarázat...
         </para>
+	<para>
+	Elsőnek is készítünk egy változót, amelyben majd taroluk a számok mennyiségét. Ezt majd növeljük minden szám beírása után.
+	Majd a számjegyeket 0-9-ig definiáljuk 'digit' név alatt.
+	<programlisting><![CDATA[
+	%{
+	#include <stdio.h>
+	int realnumbers = 0;
+	%}
+	digit	[0-9]
+	]]></programlisting>
+	</para>
+	<para>
+	A következő részben megadjuk a programnak a mintát amit keresnie kell.
+	<programlisting><![CDATA[
+	%%
+	{digit}*(\.{digit}+)?	{++realnumbers; 
+	    printf("[realnum=%s %f]", yytext, atof(yytext));}
+	%%
+	
+	]]></programlisting>
+	</para>
+	<para>
+	A '{digit}*' rész azt jelenti hogy bármennyi digit, tehát szám lehet.
+	<programlisting><![CDATA[
+	{digit}*(\.{digit}+)?
+	]]></programlisting>
+	</para>
+	<para>
+	A '\.' részen a pont önmagában annyit tesz hogy bármilyen karakterre rá lehet illeszteni. Viszont jelen esetben nekünk a '\' jellel le kell "védenünk". Így a program a valós számoknál lévő pontot fogja értelmezni.
+	</para>
+	<para>
+	A '\.' után jönnek a számjegyek, a '+' pedig annyit jelent, hogy legalább egy digitnek lennie kell a pont után.
+	<programlisting><![CDATA[
+	(\.{digit}+)?
+	]]></programlisting>
+	</para>
+	<para>
+ 	Ezután kiírjuk a számot amit a program felismert, 'atof'-al pedig a double tipusba konvertált változatát is.
+		<programlisting><![CDATA[
+	{++realnumbers; 
+	    printf("[realnum=%s %f]", yytext, atof(yytext));}
+	]]></programlisting>
+	</para>
+	<para>
+	Végül lehívjuk a lexert, és szépen elvégez nekünk minden maradékot.
+	
+	<programlisting><![CDATA[
+	int
+	main ()
+	{
+	 yylex ();
+	 printf("The number of real numbers is %d\n", realnumbers);
+	 return 0;
+	}  
+	]]></programlisting>
+
+	</para>
+	<para>
+	A teljes kód így néz ki:
+	<programlisting><![CDATA[
+	%{
+	#include <stdio.h>
+	int realnumbers = 0;
+	%}
+	digit	[0-9]
+	%%
+	{digit}*(\.{digit}+)?	{++realnumbers; 
+	    printf("[realnum=%s %f]", yytext, atof(yytext));}
+	%%
+	int
+	main ()
+	{
+	 yylex ();
+	 printf("The number of real numbers is %d\n", realnumbers);
+	 return 0;
+	}         
+	]]></programlisting>
+	</para>
     </section>                     
 
     <section>

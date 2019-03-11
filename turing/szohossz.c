@@ -1,17 +1,12 @@
 #include <stdio.h>
-int main()
+int
+main (void)
 {
-	int word = 1;
-	int length = 0;
-	
-	do
-	{
-		length++;
-	} 
-	while (word<<=1);
-	
-	
-	printf("A szó %d bites\n", length);
-    
-    return 0;
+  int hossz = 0;
+  int wat = 1;
+  do
+    ++hossz;
+  while (wat <<= 1);
+  printf ("szohossz: %d bites\n", hossz);
+  return 0;
 }

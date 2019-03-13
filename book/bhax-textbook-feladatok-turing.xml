@@ -581,6 +581,26 @@ annál jobb minőségűnek fog számítani egy linkelése vagy szavazata.
 A Brun tétel azt mondja, hogy az ikerprímszámok reciprokából képzett összege konvergál egy számhoz. Ezt határt 
 Brun konstansnak nevezzük. Ezzel ellentétben a prímszámok a végtelen felé tartanak.
 	</para>
+	<para>
+            <programlisting language="c"><![CDATA[stp <- function(x){
+    primes = primes(x)
+    diff = primes[2:length(primes)]-primes[1:length(primes)-1]
+    idx = which(diff==2)
+    t1primes = primes[idx]
+    t2primes = primes[idx]+2
+    rt1plust2 = 1/t1primes+1/t2primes
+    return(sum(rt1plust2))
+}
+    ]]>
+            </programlisting>
+</para>
+	<para>
+	A program először a primeket számolja ki x-ig. Ezután az egymásmellett álló prímeket kivonja egymásból. Az 'idx' azt nézi, hogy ha a különbség kettő, akkor azok ikerprímek. 't1primes' változóba azokat a vizsgált számpároknak első elemét tároljuk melyeknek különbsége 3. 
+	</para>
+	<para>
+	't2primes' változóba azt a vizsgált számpár második elemét mentjük, ahol a különbség 4.
+	Ezután jön a matek része, a függvény reciprokokat hoz létre, azokat összeadja. Ezeket kiírjuk, és láthatjuk merre konvergál. A prímek felső határhoz konvergálnak. 
+	</para>
     </section>
     
     <section xml:id="bhax-textbook-feladatok-turing.MontyHall">
@@ -677,3 +697,4 @@ length(nemvaltoztatesnyer)+length(valtoztatesnyer)
     </section>
 
 </chapter>                
+

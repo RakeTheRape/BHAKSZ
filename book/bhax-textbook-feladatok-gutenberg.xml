@@ -1,0 +1,215 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Gutenberg!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+        <cover>
+            <para>
+                Programozás tankönyvek rövid olvasónaplói.
+            </para>
+        </cover>
+    </info>
+    <section>
+        <title>Juhász István: Magas Szintű Programozási Nyelvek 1</title>
+        <para>         
+
+	A való világ túlságosan bonyolult ahhoz, hogy tökéletesen lemásoljuk a mechanikai működését, mégis a programozás valamelyest ezzel a céllal jött létre.  Az emberi gondolkodást, modellezést próbálja utánozni, ezzel segítve az embereket a problémák megoldásában.
+
+	</para>
+	<para>
+
+	Először is pár alapfogalmat tisztáznunk. A számítógépek programozására kialakult nyelveket három szintre tagoljuk:
+	</para>
+	
+
+	        <itemizedlist mark="bullet">
+            <listitem>
+                <para>
+	-Gépi nyelv:
+		Ez a legalsó nyelv, ez áll a legközelebb a géphez, közvetlenül ezt képes értelmezni a processzor, általában kettes számrendszerben íródok, de van pl. hexadecimális, azaz tizenhatos számrendszeren alapuló gépi kód is. Az ember és a gép között ez a nyelv a gép felé áll.
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+	-Assembly szintű nyelv:
+		Az assembly egy program nyelv, amit csaknem minden programozási nyelv előállít végeredményként. Szimbolikus gépi kódnak is szokták nevezni.
+                </para>
+            </listitem>
+	    <listitem>
+                <para>
+	-Magas szintű nyelv:
+		Ezzel foglalkozik a programozó, ez áll a legközelebb az emberi nyelvhez, a könnyű érthetőség érdekében. A magas szintű programozási nyelveket át kell alakítanunk valamilyen módon, pl. interpreteres, azaz értelmező móddal, vagy fordítóprogram segítségével. A fordítóprogram gépi kódot állít elő.
+                </para>
+            </listitem>
+        </itemizedlist>
+	<para>
+A Fordító Működése:
+	Ahhoz hogy lefordítsa a program a forráskódot, a következő lépéseket hajtja végre a fordítóprogram:
+</para>
+
+
+	<itemizedlist mark="bullet">
+            <listitem>
+                <para>
+	-Lexikális elemzés:
+		A lexikális elemzés során a forrásszöveget feldarabolja lexikális egységekre.
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+	-Szintaktikai elemzés:
+
+		A szintaktikai elemzés folyamán ellenőrzi, hogy teljesülnek-e az adott nyelv szintaktikai szabályai.
+                </para>
+            </listitem>
+	    <listitem>
+                <para>
+	-Szemantikai elemzés
+                </para>
+            </listitem>
+	    <listitem>
+                <para>
+	-Kódgenerálás
+                </para>
+            </listitem>
+        </itemizedlist>
+
+	<para>
+
+	Minden nyelv rendelkezik saját szabályokkal, ami természetesen változhat. Ezek a szabályok affajta használati utasítás, korlátozás, mit tehetünk és hogyan. „C” esetében felhozhatjuk példaként a C89 és a C99 szabványt.
+	Sokféle fordító program és forráskód szerkesztő létezik, úgynevezett IDE-k, úgymint Code::Blocks, Visual Studio, NetBeans.
+     
+        </para>
+	<para>
+	Utasításokból áll az algoritmus, azokat lépésenként végrehajtja, illetve ezek alapján áll össze a tárgykód. Utasításokat két részre oszthatjuk:
+	</para>
+	
+        <itemizedlist mark="bullet">
+            <listitem>
+                <para>
+                    Deklarációs utasítások
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    Végrehajtandó utasítások
+                </para>
+            </listitem>
+        </itemizedlist>
+    </section> 
+
+       
+    <section>
+        <title>Kerninghan <![CDATA[&]]> Richie</title>
+        <para>
+            Megoldás videó: <link xlink:href="https://youtu.be/zmfT9miB-jY">https://youtu.be/zmfT9miB-jY</link>
+        </para>
+        <para>
+
+	Minden programozási nyelvben közös, hogy változók és állandók alkotják a programban feldolgozott alapvető adatobjektumokat.  Deklaráláskor szükséges megadni a típusukat, nevüket, és általában ezeknek már létrehozásukkor értéket utalnak. Operátorokat arra használjuk, hogy megadjuk a gépnek mit is csináljon az adattal. A típus megadása fontos lépés, ez határozza meg milyen értéket tartalmaz, ad vissza, illetve milyeneket kaphat.
+
+	</para>
+	<para>
+
+	Most a „C” nyelvvel fogunk foglalkozni.
+
+	</para>
+	<para>
+
+	Az ANSI szabvánnyal kibővült a lehetőség a programozók számára. Minősítők kerültek bele, melyek teret adtak a programozóknak hogy más hosszúságú egészekkel is dolgozhassanak. Ilyen minősítők pl. a „signed” és „unsigned” forma, amely az előjel meglétét vagy hiányát mutatja. 
+	</para>
+	<para>
+Bevezették a
+        <programlisting language='c'>
+            <![CDATA[
+	long double
+]]>
+        </programlisting>
+adattípust, ezzel együtt a „short” előjelet is. A „short” 16bites határral bír, a „long” viszont 32bites.
+
+                
+        </para> 
+	<para>
+	C-vel foglalkozva kevés alapvető adattípust használunk:
+        <programlisting language='c'>
+            <![CDATA[
+
+	char
+		//egyetlen bájt, a gépi karakterkészlet egy elemét tárolja
+    
+
+    
+	int
+		//egész szám, mérete általában a befogadó számítógép egészek ábrázolásához használt mérete
+    
+
+    
+	float
+		//egyszeres pontosságú lebegőpontos szám
+    
+
+    
+	double
+		//kétszeres pontosságú lebegőpontos szám
+]]>
+        </programlisting>
+	</para>
+	<para>                
+	Ezekehez társulnak minősíthető specifikáció, pl 'short' és 'long'
+        <programlisting language='c'>
+            <![CDATA[
+
+	short int valami;
+	long int nagyValami;
+
+	]]>
+        </programlisting>
+        </para>
+    </section>        
+    <section>
+        <title>BME Szoftverfejlesztás C++ Nyelven</title>
+        <para>                
+	A „C++” a „C” nyelv család tagja, sok mindent örökölt tőle, legtöbbet említett örökölt tulajdonsága a „hardverközelség”. A „C++” egy Objektumorientált nyelv, a mai világban egyik legelterjedtebb nyelv, alapja sok operációs és embedded rendszernek. 
+	</para>
+	<para>
+	Alapjai a „C”-re épül, azonban vannak lényeges különbségek a két nyelv között, példaként véve egy „C++” függvényt.
+	</para>
+	<para>
+        <programlisting language='c++'>
+            <![CDATA[
+Void f(){}
+
+	]]>
+        </programlisting>
+
+	A függvénynek nincs paramétere, azaz nem lehet paraméterrel hívni. Azonban ha „C”-ben is ezt szeretnénk elérni, módosítanunk kell a függvényt, és paraméterként „...” kell írnunk.
+        <programlisting language='c'>
+            <![CDATA[
+Void f(...){}
+	
+	]]>
+        </programlisting>
+        </para>
+	<para>
+
+	Új típus is felüti a fejét, a 'bool'. Ennek értéke True vagy False lehet. Ez segíti az olvashatóságot, azonban átalakíthatjuk 'int'-re is, 0 vagy 1 értékké alakul.
+
+	</para>
+	<para>
+	
+	'C++' teret adott egy új lehetőségnek: 'függvény túlterhelés' lehetségessé vált. 'C++'-ban beazonosítjuk a függvényeket a nevük és argumentum listájuk alapján, ezáltal megnyílik a lehetőség hogy ugyanazon névvel ellátott, viszont különböző argumentum listával rendelkező függvényeket képezzünk, csakis a visszatérési érték, ami nem változhat.
+
+	</para>
+
+
+
+
+
+
+
+
+
+
+    </section>        
+</chapter> 

@@ -14,16 +14,304 @@
             nincs eltéve kiszámolt szám.
         </para>
         <para>
-            Megoldás videó:
+            Megoldás forrása:                
         </para>
         <para>
-            Megoldás forrása:                
+C++ program:
+	<programlisting language="C++"><![CDATA[
+#include <iostream>
+#include <cstdlib>
+#include <cmath>
+#include <ctime>
+
+class Veletlen
+{
+	public:
+		Veletlen();
+		~Veletlen(){};
+
+		double get();
+
+	private:
+		bool vanElrakva;
+		double ertek;
+};
+
+Veletlen::Veletlen()
+{
+	vanElrakva = false;
+	std::srand (std::time(NULL));
+};
+
+double Veletlen::get() 
+{
+	if (!vanElrakva)
+	{
+		double u1, u2, v1, v2, w;
+			do
+			{					//Algorithm starts 
+			u1 = std::rand () / (RAND_MAX + 1.0);
+			u2 = std::rand () / (RAND_MAX + 1.0);
+			v1 = 2 * u1 - 1;
+			v2 = 2 * u2 - 1;
+			w = v1 * v1 + v2 * v2;
+			}
+		while (w > 1);
+
+		double r = std::sqrt ((-2 * std::log (w)) / w);
+		ertek = r * v2;
+		vanElrakva = !vanElrakva;
+
+		return r * v1;					//Algorithm ends
+	}
+	else
+	{
+	vanElrakva = !vanElrakva;
+	return ertek;
+	}
+};
+
+int main ()
+{
+	Veletlen rnd;
+
+	for(int i=0; i<10; ++i)
+	{
+		std::cout << rnd.get() << std::endl;
+	};
+}
+	]]></programlisting>
+        </para>
+	<para>
+Ehhez a programhoz lehívjuk a <![CDATA[<cmath> és <ctime>]]> könyvtárat, ugyanis szükségünk lesz az időre, a randomizáláshoz.
+<programlisting language="C++"><![CDATA[
+#include <iostream>
+#include <cstdlib>
+#include <cmath>
+#include <ctime>
+	]]></programlisting>
+
+	</para>
+        <para>
+A 'Veletlen' class-unkban ketté szedjük a kódot: publikussá tesszük a konstruktort, destruktort, illetve egy függvényt, ami majd a random számokat fogja lekérni. Privátban pedig egy boolian változót, ami azt jelzi, hogy elvan e tárolva ugyan az a szám, mint amit épp generálunk, így elkerülve az ismétlést, illetve ennek a már meglévő számnak értékét is itt tároljuk.
+<programlisting language="C++"><![CDATA[
+		class Veletlen
+{
+	public:
+		Veletlen();
+		~Veletlen(){};
+
+		double get();
+
+	private:
+		bool vanElrakva;
+		double ertek;
+};
+]]></programlisting>
+	</para>
+        <para>
+Értékeket rakunk a konstruktorunkba, ez fog lefutni minden indításkor elsőnek. A 'vanElrakva' boolian-t 'false' kezdő értékre állítjuk, és inicializáljuk a 'srand' függvényt, amelyet lehívtunk az elején.
+<programlisting language="C++"><![CDATA[
+
+Veletlen::Veletlen()
+{
+	vanElrakva = false;
+	std::srand (std::time(NULL));
+};
+
+
+]]></programlisting>
+	</para>
+        <para>
+A lekérő függvényben történik a matek hókuszpókusz. Ha nincs eltárolva randomizált számunk, lefut az algoritmus, és vissza ad egy random számot két külön változóban. Az egyiket kiiratjuk, a másikat eltároljuk. Amennyiben viszont ha van eltárolva, egyszerüen csak kiiratjuk, és átváltjuk a 'vanElrakva' bool kapcsolónkat.
+<programlisting language="C++"><![CDATA[
+double Veletlen::get() 
+{
+	if (!vanElrakva)
+	{
+		double u1, u2, v1, v2, w;
+			do
+			{					//Algorithm starts 
+			u1 = std::rand () / (RAND_MAX + 1.0);
+			u2 = std::rand () / (RAND_MAX + 1.0);
+			v1 = 2 * u1 - 1;
+			v2 = 2 * u2 - 1;
+			w = v1 * v1 + v2 * v2;
+			}
+		while (w > 1);
+
+		double r = std::sqrt ((-2 * std::log (w)) / w);
+		ertek = r * v2;
+		vanElrakva = !vanElrakva;
+
+		return r * v1;					//Algorithm ends
+	}
+	else
+	{
+	vanElrakva = !vanElrakva;
+	return ertek;
+	}
+};
+]]></programlisting>
+	</para>
+        <para>
+A 'main()'-ben csak meghívjuk az osztályunkat, és kiiratjuk a számokat for ciklussal.
+<programlisting language="C++"><![CDATA[
+int main ()
+{
+	Veletlen rnd;
+
+	for(int i=0; i<10; ++i)
+	{
+		std::cout << rnd.get() << std::endl;
+	};
+}
+]]></programlisting>
+	</para>
+
+<para>
+<screen>
+rake@rake-desktop:~/BHAKSZ/Welch$ g++ polar.cpp -o p
+rake@rake-desktop:~/BHAKSZ/Welch$ ./p
+0.632766
+-0.678855
+-1.09296
+-0.441097
+-0.0241901
+-1.40382
+-0.0332053
+0.113661
+0.466147
+-0.618171
+</screen>
+</para>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <para>
+Java:
+<programlisting language="java"><![CDATA[
+
+public class polar
+{
+	boolean noSaved = true;
+	double saved;
+
+	public polar()
+	{
+	noSaved = true;
+	}
+	public double next()
+	{
+		if(noSaved)
+		{
+			double u1, u2, v1, v2, w;
+			do
+			{
+				u1 = Math.random();
+				u2 = Math.random();
+				v1 = 2*u1 - 1;
+				v2 = 2*u2 - 1;
+				w = v1*v1 + v2*v2;
+			}
+			while(w > 1);
+			double r = Math.sqrt((-2*Math.log(w))/w);
+			saved = r*v2;
+			noSaved = !noSaved;
+			return r*v1;
+		}
+		else
+		{
+			noSaved = !noSaved;
+			return saved;
+		}
+	}
+	public static void main(String[] args)
+	{
+		polar g = new polar();
+		for(int i=0; i<10; ++i)
+		{
+		System.out.println(g.next());
+		}
+	}
+}
+
+]]></programlisting>
         </para>
         <para>
             Tanulságok, tapasztalatok, magyarázat... térj ki arra is, hogy a JDK forrásaiban a Sun programozói
             pont úgy csinálták meg ahogyan te is, azaz az OO nemhogy nem nehéz, hanem éppen természetes neked!
         </para>                
+<para>
+<screen>
+rake@rake-desktop:~/BHAKSZ/Welch$ javac polar.java
+rake@rake-desktop:~/BHAKSZ/Welch$ java polar
+0.17893440014659887
+-0.81947922846356
+-0.19647809173484215
+-1.1995248513359387
+0.6569243187188295
+-0.2912476938056324
+0.5767102992766847
+-0.2877210857376333
+-1.0626943042449213
+0.2258635782690551
+</screen>
+</para>
+
+
+<para>
+Ha felkutatjuk a java development kit sajár Random.java fájlját, láthatjuk, hogy egy nálunk sokkal tapasztaltabb fejlesztő is hozzánk hasonlóan gondolkodva, szinte ugyanúgy írta le ezt az algoritmust.
+<programlisting language="java"><![CDATA[
+    synchronized public double nextGaussian() {
+        // See Knuth, ACP, Section 3.4.1 Algorithm C.
+        if (haveNextNextGaussian) {
+            haveNextNextGaussian = false;
+            return nextNextGaussian;
+        } else {
+            double v1, v2, s;
+            do {
+                v1 = 2 * nextDouble() - 1; // between -1 and 1
+                v2 = 2 * nextDouble() - 1; // between -1 and 1
+                s = v1 * v1 + v2 * v2;
+            } while (s >= 1 || s == 0);
+            double multiplier = StrictMath.sqrt(-2 * StrictMath.log(s)/s);
+            nextNextGaussian = v2 * multiplier;
+            haveNextNextGaussian = true;
+            return v1 * multiplier;
+        }
+    }
+]]></programlisting>
+</para>
     </section>        
+
+
+
+
+
+
+
+
+
 
     <section>
         <title>LZW</title>
@@ -31,11 +319,183 @@
             Valósítsd meg C-ben az LZW algoritmus fa-építését!
         </para>
         <para>
-            Megoldás videó:
+            Megoldás forrása:   <link xlink:href="https://progpater.blog.hu/2011/02/19/gyonyor_a_tomor">https://progpater.blog.hu/2011/02/19/gyonyor_a_tomor</link>            
         </para>
+	<para>
+		<figure>
+		<title>Binfa inorder kiirási iránya</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="../book/img/binfaorder.png" format="PNG"/>
+				</imageobject>
+			</mediaobject>
+		</figure>
+	</para>
         <para>
-            Megoldás forrása:                
+Először létrehozzuk magat a binfa strukturát, a magot. Létrehozunk egy binfa típust, ebben deklarálunk egy 'int' változót, amiben a beolvasott adatokat tárljuk. Majd létrehozunk két mutatót, amivel a fa gyerekeire mutatunk. Illetve a strukturán kívül még létrehozzuk a binfa típusra mutató mutatót.
+<programlisting language="C"><![CDATA[
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+typedef struct binfa
+{
+	int ertek;
+	struct binfa *bal_nulla;
+	struct binfa *jobb_egy;
+}
+
+
+BINFA, BINFA_PTR;
+
+]]></programlisting>
+	</para>
+        <para>
+Ebbena  függvényben memóriát foglalunk le a binfa mutatónknak. Mikor új elemet hozunk létre, memóriát szabadítunk fel, illetve ha hiba történik, kilépünk.
+<programlisting language="C"><![CDATA[
+BINFA_PTR uj_elem()
+{
+	BINFA_PTR p;
+
+	if ((p = (BINFA_PTR) malloc (sizeof (BINFA))) == NULL)
+	{
+	perror ("Memory error");
+	exit (EXIT_FAILURE);
+	}
+	return p;
+}
+
+]]></programlisting>
+	</para>
+        <para>
+Deklarálunk később felhasználandó függvényeket. Egyik kiirja a fát, másik memóriát szabadít majd fel.
+<programlisting language="C"><![CDATA[
+
+extern void kiir (BINFA_PTR elem);
+extern void szabadit (BINFA_PTR elem);
+
+]]></programlisting>
+
+	</para>
+        <para>
+
+<programlisting language="C"><![CDATA[
+
+int
+main (int argc, char **argv)
+{
+  char b;
+
+  BINFA_PTR gyoker = uj_elem ();
+  gyoker->ertek = '/';
+  BINFA_PTR fa = gyoker;
+
+  while (read (0, (void *) &b, 1))
+    {
+      write (1, &b, 1);
+      if (b == '0')
+	{
+	  if (fa->bal_nulla == NULL)
+	    {
+	      fa->bal_nulla = uj_elem ();
+	      fa->bal_nulla->ertek = 0;
+	      fa->bal_nulla->bal_nulla = fa->bal_nulla->jobb_egy = NULL;
+	      fa = gyoker;
+	    }
+	  else
+	    {
+	      fa = fa->bal_nulla;
+	    }
+	}
+      else
+	{
+	  if (fa->jobb_egy == NULL)
+	    {
+	      fa->jobb_egy = uj_elem ();
+	      fa->jobb_egy->ertek = 1;
+	      fa->jobb_egy->bal_nulla = fa->jobb_egy->jobb_egy = NULL;
+	      fa = gyoker;
+	    }
+	  else
+	    {
+	      fa = fa->jobb_egy;
+	    }
+	}
+    }
+
+  printf ("\n");
+  kiir (gyoker);
+  extern int max_melyseg;
+  printf ("melyseg=%d", max_melyseg);
+  szabadit (gyoker);
+}
+
+]]></programlisting>
+
+	</para>
+        <para>
+<programlisting language="C"><![CDATA[
+
+static int melyseg = 0;
+int max_melyseg = 0;
+
+void
+kiir (BINFA_PTR elem)
+{
+  if (elem != NULL)
+    {
+      ++melyseg;
+      if (melyseg > max_melyseg)
+	max_melyseg = melyseg;
+      kiir (elem->jobb_egy);
+      for (int i = 0; i < melyseg; ++i)
+	printf ("---");
+      printf ("%c(%d)\n", elem->ertek < 2 ? '0' + elem->ertek : elem->ertek,
+	      melyseg);
+      kiir (elem->bal_nulla);
+      --melyseg;
+    }
+}
+
+]]></programlisting>
+	</para>
+        <para>
+<programlisting language="C"><![CDATA[
+
+void
+szabadit (BINFA_PTR elem)
+{
+  if (elem != NULL)
+    {
+      szabadit (elem->jobb_egy);
+      szabadit (elem->bal_nulla);
+      free (elem);
+    }
+}
+
+]]></programlisting>
         </para>
+	<screen>
+<![CDATA[
+rake@rake-desktop:~/BHAKSZ/Welch$ gcc binfa.c -o b
+rake@rake-desktop:~/BHAKSZ/Welch$ ./b < test.txt
+01010111110101010010101011011
+
+---------1(3)
+------1(2)
+------------1(4)
+---------0(3)
+---/(1)
+---------------1(5)
+------------1(4)
+---------1(3)
+------------------1(6)
+---------------1(5)
+------------0(4)
+------0(2)
+melyseg=6
+]]>
+	</screen>
     </section>        
         
     <section>
@@ -43,12 +503,185 @@
         <para>
             Járd be az előző (inorder bejárású) fát pre- és posztorder is!
         </para>
+	<para>
+		<figure>
+		<title>Binfa inorder kiirási iránya</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="../book/img/binfaorder.png" format="PNG"/>
+				</imageobject>
+			</mediaobject>
+		</figure>
+	</para>
         <para>
-            Megoldás videó:
-        </para>
+<programlisting language="C"><![CDATA[
+
+static int melyseg = 0;
+int max_melyseg = 0;
+
+void
+kiir (BINFA_PTR elem)
+{
+  if (elem != NULL)
+    {
+      ++melyseg;
+      if (melyseg > max_melyseg)
+	max_melyseg = melyseg;
+      kiir (elem->jobb_egy);
+      for (int i = 0; i < melyseg; ++i)
+	printf ("---");
+      printf ("%c(%d)\n", elem->ertek < 2 ? '0' + elem->ertek : elem->ertek,
+	      melyseg);
+      kiir (elem->bal_nulla);
+      --melyseg;
+    }
+}
+
+]]></programlisting>
+	</para>
+	<screen>
+<![CDATA[
+rake@rake-desktop:~/BHAKSZ/Welch$ gcc binfa.c -o b
+rake@rake-desktop:~/BHAKSZ/Welch$ ./b < test.txt
+01010111110101010010101011011
+
+---------1(3)
+------1(2)
+------------1(4)
+---------0(3)
+---/(1)
+---------------1(5)
+------------1(4)
+---------1(3)
+------------------1(6)
+---------------1(5)
+------------0(4)
+------0(2)
+melyseg=6
+]]>
+	</screen>
+
+	<para>
+		<figure>
+		<title>Binfa Preorder kiirási iránya</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="../book/img/binfapreorder.png" format="PNG"/>
+				</imageobject>
+			</mediaobject>
+		</figure>
+	</para>
+
         <para>
-            Megoldás forrása:                
-        </para>
+<programlisting language="C"><![CDATA[
+
+static int melyseg = 0;
+int max_melyseg = 0;
+
+void
+kiir (BINFA_PTR elem)
+{
+  if (elem != NULL)
+    {
+      ++melyseg;
+      if (melyseg > max_melyseg)
+	max_melyseg = melyseg;
+
+      kiir (elem->jobb_egy);
+      kiir (elem->bal_nulla);
+      for (int i = 0; i < melyseg; ++i)
+	printf ("---");
+      printf ("%c(%d)\n", elem->ertek < 2 ? '0' + elem->ertek : elem->ertek,
+	      melyseg);
+
+      --melyseg;
+    }
+}
+
+]]></programlisting>
+	</para>
+<screen>
+<![CDATA[
+
+rake@rake-desktop:~/BHAKSZ/Welch$ gcc binfapre.c -o bp
+rake@rake-desktop:~/BHAKSZ/Welch$ ./bp < test.txt
+01010111110101010010101011011
+
+---------1(3)
+------------1(4)
+---------0(3)
+------1(2)
+---------------1(5)
+------------1(4)
+------------------1(6)
+---------------1(5)
+------------0(4)
+---------1(3)
+------0(2)
+---/(1)
+melyseg=6
+]]>
+</screen>
+	<para>
+		<figure>
+		<title>Binfa Postorder kiirási iránya</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="../book/img/binfapostorder.png" format="PNG"/>
+				</imageobject>
+			</mediaobject>
+		</figure>
+	</para>
+
+        <para>
+<programlisting language="C"><![CDATA[
+
+static int melyseg = 0;
+int max_melyseg = 0;
+
+void
+kiir (BINFA_PTR elem)
+{
+  if (elem != NULL)
+    {
+      ++melyseg;
+      if (melyseg > max_melyseg)
+	max_melyseg = melyseg;
+
+      for (int i = 0; i < melyseg; ++i)
+	printf ("---");
+      printf ("%c(%d)\n", elem->ertek < 2 ? '0' + elem->ertek : elem->ertek,
+	      melyseg);
+      kiir (elem->jobb_egy);
+      kiir (elem->bal_nulla);
+      --melyseg;
+    }
+}
+
+]]></programlisting>
+	</para>
+<screen>
+<![CDATA[
+rake@rake-desktop:~/BHAKSZ/Welch$ gcc binfapost.c -o bpost
+rake@rake-desktop:~/BHAKSZ/Welch$ ./bpost < test.txt
+01010111110101010010101011011
+
+---/(1)
+------1(2)
+---------1(3)
+---------0(3)
+------------1(4)
+------0(2)
+---------1(3)
+------------1(4)
+---------------1(5)
+------------0(4)
+---------------1(5)
+------------------1(6)
+melyseg=6
+]]>
+</screen>
+
     </section>        
                         
     <section>
@@ -58,11 +691,156 @@
             osztálya. A gyökér csomópont legyen kompozícióban a fával!
         </para>
         <para>
-            Megoldás videó:
+            Megoldás forrása:  <link xlink:href="https://progpater.blog.hu/2011/04/01/imadni_fogjak_a_c_t_egy_emberkent_tiszta_szivbol_2 ">https://progpater.blog.hu/2011/04/01/imadni_fogjak_a_c_t_egy_emberkent_tiszta_szivbol_2 </link>  
+<link xlink:href="https://progpater.blog.hu/2011/04/14/egyutt_tamadjuk_meg">https://progpater.blog.hu/2011/04/14/egyutt_tamadjuk_meg</link>            
         </para>
-        <para>
-            Megoldás forrása:                
-        </para>
+
+<para>
+Tehát ugyanezt kéne megoldanunk, egy Tree és egy Node osztály beágyazással. Egyelőre Node nem kap különös szerepet, csak beágyazzuk.
+</para>
+<para>
+<programlisting language="C++"><![CDATA[
+#include <iostream>
+class LZWTree
+{
+	public:
+		LZWTree (): fa(&gyoker){}
+		~LZWTree ()
+		{
+			szabadit (gyoker.egyesGyermek ());
+			szabadit (gyoker.nullasGyermek ());
+		}
+	void operator<<(char b)
+	{
+		if (b == ’0’)
+		{
+			if (!fa->nullasGyermek ())
+			{
+				Node *uj = new Node (’0’);
+				fa->ujNullasGyermek (uj);
+				fa = &gyoker;
+			}
+			else
+			{
+				fa = fa->nullasGyermek ();
+			}
+		}
+		else
+		{
+		FT
+			if (!fa->egyesGyermek ())			
+			{
+				Node *uj = new Node (’1’);
+				fa->ujEgyesGyermek (uj);
+				fa = &gyoker;
+			}
+			else
+			{
+			fa = fa->egyesGyermek ();
+			}
+		}
+	}
+	void kiir (void)
+	{
+		melyseg = 0;
+		kiir (&gyoker);
+	}
+	void szabadit (void)
+	{
+		szabadit (gyoker.jobbEgy);
+		szabadit (gyoker.balNulla);
+	}
+]]></programlisting>
+</para>
+<para>
+Ebben az osztályban a gyökér objektum, a fa mutató, kis cserebere történt. A fa mutató az éppen készülő fa azon csomópontjára/node-jára mutat ahol épp járunk.
+<programlisting language="C++"><![CDATA[
+private:
+	class Node
+	{
+	public:
+		Node (char b = ’/’):betu (b), balNulla (0), jobbEgy (0) {};
+		~Node () {};
+		Node *nullasGyermek () {
+		return balNulla;
+	}
+	Node *egyesGyermek ()
+	{
+		return jobbEgy;
+	}
+	void ujNullasGyermek (Node * gy)
+	{
+		balNulla = gy;
+	}
+	void ujEgyesGyermek (Node * gy)
+	{
+		jobbEgy = gy;
+	}
+	
+	private:
+		friend class LZWTree;
+		char betu;
+		Node *balNulla;
+		Node *jobbEgy;
+		Node (const Node &);
+		Node & operator=(const Node &);
+};
+]]></programlisting>
+</para>
+<para>
+A Node osztály privátba került, védelmi szempontokból, így csak a fa osztályon belül érhető el. Konstruktorunknak nem adtunk paramétert egyenlőre, így a default müvelete, hogy '/' jellel hoz Node-ot létre.
+<programlisting language="C++"><![CDATA[
+Node gyoker;
+Node *fa;
+int melyseg;
+
+LZWTree (const LZWTree &);
+LZWTree & operator=(const LZWTree &);
+
+void kiir (Node* elem)
+{
+	if (elem != NULL)
+	{
+		++melyseg;
+		kiir (elem->jobbEgy);
+		for (int i = 0; i < melyseg; ++i)
+			std::cout << "---";
+		std::cout << elem->betu << "(" << melyseg - 1 << ")" << std:: ←-
+			endl;
+		kiir (elem->balNulla);
+		--melyseg;
+	}
+}
+void szabadit (Node * elem)
+{
+	if (elem != NULL)
+	{
+		szabadit (elem->jobbEgy);
+		szabadit (elem->balNulla);
+		delete elem;
+	}
+}
+};
+]]></programlisting>
+</para>
+<para>
+<programlisting language="C++"><![CDATA[
+int main ()
+{
+	char b;
+	LZWTree binFa;
+	while (std::cin >> b)
+{
+	binFa << b;
+}
+binFa.kiir ();
+binFa.szabadít ();
+
+return 0;
+}
+]]></programlisting>
+</para>
+
     </section>        
                 
     <section>
@@ -72,11 +850,36 @@
             fával!
         </para>
         <para>
-            Megoldás videó: 
-        </para>
-        <para>
             Megoldás forrása:  
         </para>
+<para>
+Most annyiban változtatunk, hogy eddig a fa gyökerét objektumkét hoztuk létre, mostantól mutató lesz ez is, a fával együtt.
+<programlisting language="C++"><![CDATA[
+class LZWTree
+{
+public:
+	LZWTree ()
+	{
+		gyoker = new Node();
+		fa = gyoker;
+	}
+
+	~LZWTree ()
+	{
+		szabadit (gyoker->egyesGyermek ());
+		szabadit (gyoker->nullasGyermek ());
+		delete gyoker;
+	}
+]]></programlisting>
+</para>
+<para>
+A konstruktorban a gyökeret is mutatóként írjuk fel, és mindenhol kitöröljük a gyökér elől a referencia jeleket. <![CDATA['&']]>
+<programlisting language="C++"><![CDATA[
+Node *gyoker;
+Node *fa;
+int melyseg;
+]]></programlisting>
+</para>
     </section>                     
 
     <section>
@@ -86,11 +889,55 @@
             értékadásra alapozva!
         </para>
         <para>
-            Megoldás videó: 
+            Megoldás forrása:  
+
+<link xlink:href="https://sourceforge.net/projects/udprog/">https://sourceforge.net/projects/udprog/</link>
         </para>
         <para>
-            Megoldás forrása:  
-        </para>
+<programlisting language="C++"><![CDATA[
+LZWTree& operator= (LZWTree& copy) //másoló értékadás
+{
+	szabadit(gyoker->egyesGyermek ()); //régi értéket törlöm
+	szabadit(gyoker->nullasGyermek ());
+	bejar(gyoker,copy.gyoker); //rekurzívan bejárom a fákat és átmásolom az értékeket
+	fa = gyoker; //mindkét fában visszaugrok a gyökérhez
+	copy.fa = copy.gyoker;
+}
+	void bejar (Node * masolat, Node * eredeti) //rekurzív famásolás,
+	másoló értékadáshoz
+	{
+		if (eredeti != NULL) //ha létezik a másolandó fa
+		{
+			if ( !eredeti->nullasGyermek() ) //ha nem létezik az eredeti nullasgyermeke
+			{
+			masolat->ujNullasGyermek(NULL);
+			}
+			else //ha létezik az eredeti nullásgyermeke
+			{
+			//létrehozni a masolat nullasgyermeket és meghívni újra a  bejart
+				Node* uj = new Node (’0’);
+				masolat->ujNullasGyermek (uj);
+				bejar(masolat->nullasGyermek(), eredeti->nullasGyermek());
+			}
+			if ( !eredeti->egyesGyermek() ) //ha nem létezik az eredeti egyesgyermeke
+			{
+				masolat->ujEgyesGyermek(NULL);
+			}
+			else //ha létezik az eredeti egyesgyermeke
+			{
+			//létrehozni a masolat egyesgyermeket és meghívni újra a bejart
+				Node *uj = new Node (’1’);
+				masolat->ujEgyesGyermek (uj);
+				bejar(masolat->egyesGyermek(), eredeti->egyesGyermek());
+			}
+		}
+		else //ha nem létezik a másolandó fa
+		{
+			masolat = NULL;
+		}
+}
+]]></programlisting>
+</para>
     </section>                     
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
 </chapter>                

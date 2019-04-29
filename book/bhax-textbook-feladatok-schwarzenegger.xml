@@ -6,22 +6,200 @@
         </keywordset>
     </info>
     <section>
-        <title>Szoftmax Py MNIST</title>
-        <para>aa
-            Python
+        <title>Szoftmax Python MNIST</title>
+        <para>
+            Megoldás forrása:<link xlink:href='http://yann.lecun.com/exdb/mnist/'>http://yann.lecun.com/exdb/mnist/</link>                
         </para>
         <para>
-            Megoldás videó:
-        </para>
+	Elsőnek is, mi is az az MNIST? Az MNIST database (Modified National Institute of Standards and Technology database) egy több tízezer kézzel írott számokat tartalmazó adatbázis, ami az NIST eredeti adatbázisból lett újra "mixelve"
+	</para>
         <para>
-            Megoldás forrása:                
+	Az MNIST összesen 60,000 képet tartalmaz betanításra, és 10,000 képet tesztelésre. Ezek mind 28x28-as méretű képek. Pár kutató szerint közel emberi szintű teljesítményt nyújt a Neural Networks-ön alapuló program.
+	</para>
+	<para>
+	Hogy könnyebben megértsük a neural networks működését, itt láthatjuk a példát, vizualizálva és rétegekre bontva:
+	</para>
+	<para>
+<link xlink:href="https://scs.ryerson.ca/~aharley/vis/conv/">MNIST</link> 
+
+	</para>
+	<para>
+Kezdjük is az előkészületeket. Először is fel kell telepítenünk a szükséges programokat, library-kat, stb.
+</para>
+	<para>
+<screen>
+<![CDATA[
+sudo apt-get install python3-matplotlib
+sudo apt-get install python3-tk 
+sudo apt install python3-dev python3-pip
+sudo pip3 install -U virtualenv  # system-wide install
+
+//Létrehozzuk a virtuális környezetünket:
+
+virtualenv --system-site-packages -p python3 ./venv
+source ./venv/bin/activate  # sh, bash, ksh, or zsh
+pip install --upgrade pip
+pip install --upgrade tensorflow
+python -c "import tensorflow as tf; tf.enable_eager_execution(); print(tf.reduce_sum(tf.random_normal([1000, 1000])))" 
+
+]]>
+</screen>
+	</para>
+	<para>
+<programlisting language='Python'>
+<![CDATA[
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
+import argparse
+
+# Import data
+from tensorflow.examples.tutorials.mnist import input_data
+
+import tensorflow as tf
+old_v = tf.logging.get_verbosity()
+tf.logging.set_verbosity(tf.logging.ERROR)
+
+import matplotlib.pyplot
+
+
+FLAGS = None
+
+def main(_):
+  mnist = input_data.read_data_sets(FLAGS.data_dir, one_hot=True)
+
+]]>
+</programlisting>
+
+	Első lépésben importáljuk az adatbázisból a képeket, az "argparse" könyvtárat, ami segítségével kapcsolókat hozunk majd létre és két könyvtárat is. A TensorFlow-ot  és a matplotlib-et. Ezután elkezdjük építeni a neurális hálózatunkat.
+<programlisting language='Python'>
+<![CDATA[
+  # Create the model
+  x = tf.placeholder(tf.float32, [None, 784])
+  W = tf.Variable(tf.zeros([784, 10]))
+  b = tf.Variable(tf.zeros([10]))
+  y = tf.matmul(x, W) + b]]>
+</programlisting>
+	</para>
+	<para>
+	Létrehozunk tenzorokat, (tenzorok lehetnek több szintűek, legegyszerűbb őket úgy elképzelni, hogy első szintű tenzor egy vektor, második szintű egy mátrix, harmadik szintű egy 3dimenziós kocka mátrix) legelső tenzorunk az 'x' amely a placeholder-ünk lesz, ő fogja kapni az értékeket. Megadjuk neki hogy 784 pixeles képeket fog kapni, ugyebár 28x28 méretűek az MNIST adatbáziunkból való képeink.
+Emellett létrehozunk két tenzort, a 'W'-t mint weight, és 'b'-t mint bias-t.
+	</para>
+	<para>
+Amit még fontosabb kiemelni az az 'y' tenzor. Ő kapja meg az előző két változót, és az 'x' tenzorunkat is. Az 'y' értékei 0-tól 1-ig terjednek. Ez alapozza meg a softmax modellünket. Ha többet szeretne megtudni a modellről, kövesse ezt a forrást:
+<link xlink:href="https://developers.google.com/machine-learning/crash-course/multi-class-neural-networks/softmax">Softmax Modell</link>
+	</para>
+	<para>
+A kód további része:
+<programlisting language='Python'>
+<![CDATA[
+  # Define loss and optimizer
+  y_ = tf.placeholder(tf.float32, [None, 10])
+
+  # The raw formulation of cross-entropy,
+  #
+  #   tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(tf.nn.softmax(y)),
+  #                                 reduction_indices=[1]))
+  #
+  # can be numerically unstable.
+  #
+  # So here we use tf.nn.softmax_cross_entropy_with_logits on the raw
+  # outputs of 'y', and then average across the batch.
+  cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels = y_, logits = y))
+  train_step = tf.train.GradientDescentOptimizer(0.5).minimize(cross_entropy)
+
+  sess = tf.InteractiveSession()
+  # Train
+  tf.initialize_all_variables().run(session=sess)
+  print("-- A halozat tanitasa")  
+  for i in range(1000):
+    batch_xs, batch_ys = mnist.train.next_batch(100)
+    sess.run(train_step, feed_dict={x: batch_xs, y_: batch_ys})
+    if i % 100 == 0:
+      print(i/10, "%")
+  print("----------------------------------------------------------")
+
+  # Test trained model
+  print("-- A halozat tesztelese")  
+  correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
+  accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))  
+  print("-- Pontossag: ", sess.run(accuracy, feed_dict={x: mnist.test.images,
+                                      y_: mnist.test.labels}))
+  print("----------------------------------------------------------")
+  
+  print("-- A MNIST 42. tesztkepenek felismerese, mutatom a szamot, a tovabblepeshez csukd be az ablakat")
+  
+  img = mnist.test.images[42]
+  image = img
+
+  matplotlib.pyplot.imshow(image.reshape(28, 28), cmap=matplotlib.pyplot.cm.binary)
+  matplotlib.pyplot.savefig("4.png")  
+  matplotlib.pyplot.show()
+
+  classification = sess.run(tf.argmax(y, 1), feed_dict={x: [image]})
+
+  print("-- Ezt a halozat ennek ismeri fel: ", classification[0])
+  print("----------------------------------------------------------")
+
+  print("--  A MNIST 9. tesztkepenek felismerese, mutatom a szamot, a tovabblepeshez csukd be az ablakat")
+  
+  img = mnist.test.images[9]
+  image = img
+
+  matplotlib.pyplot.imshow(image.reshape(28, 28), cmap=matplotlib.pyplot.cm.binary)
+  matplotlib.pyplot.savefig("9.png")  
+  matplotlib.pyplot.show()
+  
+  classification = sess.run(tf.argmax(y, 1), feed_dict={x: [image]})
+
+  print("-- Ezt a halozat ennek ismeri fel: ", classification[0])
+  print("----------------------------------------------------------")
+
+if __name__ == '__main__':
+  parser = argparse.ArgumentParser()
+  parser.add_argument('--data_dir', type=str, default='/tmp/tensorflow/mnist/input_data',
+                      help='Directory for storing input data')
+  FLAGS = parser.parse_args()
+  tf.app.run()
+]]>
+</programlisting>
+	
+	
+
         </para>
-        <para>
-            Tanulságok, tapasztalatok, magyarázat...
-        </para>
+<screen>
+-- A halozat tesztelese
+-- Pontossag:  0.9205
+----------------------------------------------------------
+-- A MNIST 42. tesztkepenek felismerese, mutatom a szamot, a tovabblepeshez csukd be az ablakat
+-- Ezt a halozat ennek ismeri fel:  4
+----------------------------------------------------------
+--  A MNIST 9. tesztkepenek felismerese, mutatom a szamot, a tovabblepeshez csukd be az ablakat
+-- Ezt a halozat ennek ismeri fel:  9
+----------------------------------------------------------
+</screen>
+<figure>
+		<title>SMINST első képe</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="../book/img/sminst1.png" format="PNG"/>
+				</imageobject>
+			</mediaobject>
+		</figure>
+
+<figure>
+		<title>SMINST második képe</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="../book/img/sminst2.png" format="PNG"/>
+				</imageobject>
+			</mediaobject>
+		</figure>
+
     </section>        
 
-    <section>
+<!--    <section>
         <title>Szoftmax R MNIST</title>
         <para>
             R            
@@ -36,7 +214,7 @@
             Tanulságok, tapasztalatok, magyarázat...
         </para>
     </section>        
-
+-->
     <section>
         <title>Mély MNIST</title>
         <para>
@@ -45,14 +223,12 @@
         <para>
             Megoldás videó:
         </para>
-        <para>
-            Megoldás forrása:                
-        </para>
+
         <para>
             Tanulságok, tapasztalatok, magyarázat...
         </para>
     </section>        
-
+<!--
     <section>
         <title>Deep dream</title>
         <para>
@@ -83,5 +259,33 @@
             Tanulságok, tapasztalatok, magyarázat...
         </para>
     </section>        
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+-->
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+    <section>
+        <title>Minecraft-MALMÖ</title>
+        <para>
+        </para>
+        <para>
+            Megoldás videó: <link xlink:href="https://youtu.be/bAPSu3Rndi8">https://youtu.be/bAPSu3Rndi8</link>      
+        </para>
+        <para>
+            Megoldás forrása:                
+        </para>
+        <para>
+            Tanulságok, tapasztalatok, magyarázat...
+        </para>
+    </section>        
+        
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
 </chapter>                
+             
